@@ -26,9 +26,9 @@
 html, body {
   height: 100%;
   background: #0a0a0a;
-  background-image:
+  /* background-image:
     radial-gradient(ellipse at 20% 50%, #1a1200 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 50%, #001a0a 0%, transparent 60%);
+    radial-gradient(ellipse at 80% 50%, #001a0a 0%, transparent 60%); */
   display: flex;
   align-items: center;
   justify-content: center;
