@@ -12,6 +12,8 @@ interface TrackData {
   startTime: number;
   endTime: number;
   verse: string;
+  trackId: string; // ← new
+  wasReset: boolean; // ← new
 }
 
 export default function Walkman() {
@@ -22,6 +24,7 @@ export default function Walkman() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const rafRef = useRef<number>(0);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const [seenIds, setSeenIds] = useState<string[]>([]);
 
   const unlockAudio = useCallback(() => {
     if (!audioCtxRef.current) {
@@ -46,16 +49,23 @@ export default function Walkman() {
     cancelAnimationFrame(rafRef.current);
 
     try {
-      const res = await fetch("/api/track");
+      const params = seenIds.length > 0 ? `?seen=${seenIds.join(",")}` : "";
+      const res = await fetch(`/api/track${params}`);
       if (!res.ok) throw new Error("Failed to fetch");
-      const data: TrackData = await res.json();
+      const data = await res.json();
+
+      // Update seen list, reset if server says all tracks were exhausted
+      setSeenIds((prev) =>
+        data.wasReset ? [data.trackId] : [...prev, data.trackId],
+      );
+
       setTrack(data);
       setState("playing");
     } catch {
       setError("Could not load track.");
       setState("idle");
     }
-  }, [unlockAudio]);
+  }, [unlockAudio, seenIds]);
 
   useEffect(() => {
     if (state !== "playing" || !track) return;
@@ -90,7 +100,7 @@ export default function Walkman() {
 
     const onError = () => {
       cancelAnimationFrame(rafRef.current);
-      setError("Audio file not found. Check /public/audio/ filename.");
+      setError("Audio file not found. Check the track URL.");
       setState("done");
     };
 
