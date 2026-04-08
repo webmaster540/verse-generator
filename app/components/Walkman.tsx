@@ -12,8 +12,8 @@ interface TrackData {
   startTime: number;
   endTime: number;
   verse: string;
-  trackId: string; // ← new
-  wasReset: boolean; // ← new
+  trackId: string;
+  wasReset: boolean;
 }
 
 export default function Walkman() {
@@ -35,18 +35,21 @@ export default function Walkman() {
     }
   }, []);
 
-  const fetchTrack = useCallback(async () => {
-    unlockAudio();
-    setState("loading");
-    setError(null);
-    setProgress(0);
-
+  const stopCurrentAudio = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.src = "";
       audioRef.current = null;
     }
     cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  const fetchTrack = useCallback(async () => {
+    unlockAudio();
+    stopCurrentAudio();
+    setState("loading");
+    setError(null);
+    setProgress(0);
 
     try {
       const params = seenIds.length > 0 ? `?seen=${seenIds.join(",")}` : "";
@@ -54,7 +57,6 @@ export default function Walkman() {
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
 
-      // Update seen list, reset if server says all tracks were exhausted
       setSeenIds((prev) =>
         data.wasReset ? [data.trackId] : [...prev, data.trackId],
       );
@@ -65,7 +67,7 @@ export default function Walkman() {
       setError("Could not load track.");
       setState("idle");
     }
-  }, [unlockAudio, seenIds]);
+  }, [unlockAudio, stopCurrentAudio, seenIds]);
 
   useEffect(() => {
     if (state !== "playing" || !track) return;
@@ -83,7 +85,6 @@ export default function Walkman() {
     const audio = new Audio(track.previewUrl);
     audioRef.current = audio;
 
-    // Keep references to handlers so we can remove them during cleanup
     const onReady = async () => {
       try {
         if (audioCtxRef.current?.state === "suspended") {
@@ -124,8 +125,6 @@ export default function Walkman() {
     audio.addEventListener("error", onError);
 
     return () => {
-      // Remove listeners BEFORE clearing src so the error event
-      // doesn't fire during cleanup and show a false error message
       audio.removeEventListener("loadedmetadata", onReady);
       audio.removeEventListener("error", onError);
       cancelAnimationFrame(rafRef.current);
@@ -189,17 +188,10 @@ export default function Walkman() {
           </div>
 
           <div className={styles.cassetteLabel}>
-            {track ? (
-              <>
-                {/* <span className={styles.cassetteLabelTrack}>
-                  {track.trackName}
-                </span> */}
-                <span className={styles.cassetteLabelAlbum}>
-                  {track.albumName}
-                </span>
-              </>
-            ) : (
-              <span className={styles.cassetteLabelTrack}>JAY-Z</span>
+            {track && (
+              <span className={styles.cassetteLabelAlbum}>
+                {track.albumName}
+              </span>
             )}
           </div>
         </div>
@@ -260,14 +252,15 @@ export default function Walkman() {
             <span className={styles.btnIcon}>◀◀</span>
           </button>
 
+          {/* Only disabled while loading — can skip anytime during playback */}
           <button
             className={`${styles.controlBtn} ${styles.btnMain} ${isPlaying ? styles.btnActive : ""}`}
             onClick={fetchTrack}
-            disabled={isLoading || isPlaying}
+            disabled={isLoading}
           >
             {isIdle && <span>▶ PLAY</span>}
             {isLoading && <span>···</span>}
-            {isPlaying && <span>▶ PLAYING</span>}
+            {isPlaying && <span>⇄ SHUFFLE</span>}
             {isDone && <span>⇄ SHUFFLE</span>}
           </button>
 

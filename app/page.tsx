@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 // import { useState } from "react";
 // import DisplayToggle from "./components/DisplayToggle";
@@ -15,15 +15,15 @@ export default function Home() {
   // };
 
   return (
-    <Walkman />
-    // <main className="relative w-full h-screen bg-black overflow-hidden">
-    //   {/* The Toggle Button */}
-    //   <DisplayToggle mode={displayMode} onToggle={toggleMode} />
+    <main className="relative w-full h-screen bg-black overflow-hidden">
+      <Walkman />
 
-    //   Conditional Rendering
-    //   <div className="w-full h-full flex items-center justify-center">
-    //     {displayMode === "winamp" ? <Winamp /> : <Walkman />}
-    //   </div>
-    // </main>
+      {/* The Toggle Button */}
+      {/* <DisplayToggle mode={displayMode} onToggle={toggleMode} />
+      Conditional Rendering
+      <div className="w-full h-full flex items-center justify-center">
+        {displayMode === "winamp" ? <Winamp /> : <Walkman />}
+      </div> */}
+    </main>
   );
 }

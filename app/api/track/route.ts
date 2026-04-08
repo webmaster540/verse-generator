@@ -22,24 +22,24 @@ export async function GET(request: Request) {
     const { count, error: countError } = await countQuery;
     if (countError) throw countError;
 
-    // All tracks played — reset and start over
-    let wasReset = false;
+    // All tracks played — reset and start over with full pool
     if (!count || count === 0) {
-      seenIds = [];
-      wasReset = true;
       const { count: totalCount } = await supabase
         .from("tracks")
         .select("*", { count: "exact", head: true });
+
       if (!totalCount)
         return NextResponse.json({ error: "No tracks found" }, { status: 404 });
-      // Re-run with full pool
+
       const randomOffset = Math.floor(Math.random() * totalCount);
       const { data, error } = await supabase
         .from("tracks")
         .select("*")
         .range(randomOffset, randomOffset)
         .single();
+
       if (error) throw error;
+
       return NextResponse.json({
         trackName: data.track_name,
         albumName: data.album_name,
@@ -48,10 +48,12 @@ export async function GET(request: Request) {
         startTime: data.start_time,
         endTime: data.end_time,
         verse: data.verse,
+        trackId: String(data.id), // ← was missing, caused seen list to break after reset
         wasReset: true,
       });
     }
 
+    // Pick a random unseen track
     const randomOffset = Math.floor(Math.random() * count);
 
     let dataQuery = supabase
@@ -73,7 +75,7 @@ export async function GET(request: Request) {
       startTime: data.start_time,
       endTime: data.end_time,
       verse: data.verse,
-      trackId: data.id,
+      trackId: String(data.id),
       wasReset: false,
     });
   } catch (err) {

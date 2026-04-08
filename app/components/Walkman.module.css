@@ -63,7 +63,7 @@
   font-size: 13px;
   letter-spacing: 4px;
   color: var(--walkman-accent);
-  text-shadow: 0 0 8px rgba(200,168,75,0.4);
+  text-shadow: 0 0 8px rgba(75, 152, 200, 0.4);
 }
 
 .holdSwitch {
