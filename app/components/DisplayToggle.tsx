@@ -10,10 +10,7 @@ interface DisplayToggleProps {
 const DisplayToggle = ({ mode, onToggle }: DisplayToggleProps) => {
   return (
     <div className={styles.container}>
-      <button
-        onClick={onToggle}
-        className="px-4 py-2 bg-zinc-900 text-xs font-mono border border-zinc-700 text-white rounded hover:bg-zinc-800 transition-colors uppercase tracking-widest shadow-xl"
-      >
+      <button onClick={onToggle} className={styles.button}>
         {mode === "winamp" ? "📼 Switch to Walkman" : "⚡ Switch to Winamp"}
       </button>
     </div>

@@ -1,0 +1,810 @@
+/* ─── WINAMP FULL-SCREEN — BLUE THEME ─────────────────────────────────────── */
+
+/* Fills entire viewport */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: row;
+  background: #0e1520;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 11px;
+  color: #4db8ff;
+  user-select: none;
+  overflow: hidden;
+}
+
+/* ── LEFT COLUMN ── */
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  flex-shrink: 0;
+  border-right: 2px solid #000;
+}
+
+/* ── RIGHT COLUMN ── */
+.rightCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── TITLE BAR (shared) ── */
+.titleBar {
+  background: linear-gradient(180deg, #0a4a8a 0%, #052a5a 100%);
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+  flex-shrink: 0;
+  cursor: default;
+}
+
+.tbLeft {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tbDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4db8ff;
+  box-shadow: 0 0 5px #2299ff;
+  flex-shrink: 0;
+}
+
+.tbTitle {
+  font-size: 10px;
+  font-weight: bold;
+  color: #cce8ff;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.tbRight {
+  display: flex;
+  gap: 2px;
+}
+
+.tbBtn {
+  background: #0a2a4a;
+  border: 1px solid #1a4a7a;
+  color: #5599cc;
+  font-size: 9px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition:
+    background 0.1s,
+    color 0.1s;
+}
+
+.tbBtn:hover {
+  background: #1a4a7a;
+  color: #4db8ff;
+}
+
+/* ── MAIN PLAYER ── */
+.player {
+  background: #111d2e;
+  border-bottom: 2px solid #000;
+  flex-shrink: 0;
+}
+
+.vizRow {
+  display: flex;
+  height: 80px;
+  background: #000;
+  overflow: hidden;
+}
+
+.albumWrap {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-right: 1px solid #0a2a4a;
+}
+
+.albumArt {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.albumBlank {
+  width: 100%;
+  height: 100%;
+  background: #050d1a;
+}
+
+.spectrumWrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  padding: 4px;
+  background: #000;
+}
+
+.specBar {
+  flex: 1;
+  background: #003366;
+  min-height: 4px;
+  height: 30%;
+}
+
+.specActive {
+  animation: specPulse 0.25s ease-in-out infinite alternate;
+}
+
+@keyframes specPulse {
+  from {
+    height: 10%;
+    background: #0055aa;
+  }
+  to {
+    height: 90%;
+    background: #4db8ff;
+  }
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #000;
+  padding: 6px 8px;
+  border-top: 1px solid #050d1a;
+}
+
+.clockBlock {
+  flex-shrink: 0;
+}
+
+.clock {
+  font-family: "Courier New", monospace;
+  font-size: 28px;
+  font-weight: bold;
+  color: #4db8ff;
+  letter-spacing: 3px;
+  text-shadow:
+    0 0 10px #2299ff,
+    0 0 2px #4db8ff;
+}
+
+.metaBlock {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scrollTrack {
+  overflow: hidden;
+  color: #66ccff;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.marqueeText {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 12s linear infinite;
+  padding-right: 40px;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.statRow {
+  display: flex;
+  gap: 4px;
+  color: #1a5a8a;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+}
+
+.sep {
+  color: #0d2a44;
+}
+
+/* Seek */
+.seekRow {
+  padding: 5px 8px;
+  background: #0e1828;
+  border-top: 1px solid #050d1a;
+}
+
+.seekBar {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: #050d1a;
+  border: 1px solid #0a2a4a;
+  outline: none;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.seekBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 14px;
+  background: #2299ff;
+  cursor: pointer;
+  border: 1px solid #0055cc;
+}
+
+.seekBar::-moz-range-thumb {
+  width: 12px;
+  height: 14px;
+  background: #2299ff;
+  cursor: pointer;
+  border: 1px solid #0055cc;
+  border-radius: 0;
+}
+
+/* Vol / Bal */
+.knobRow {
+  display: flex;
+  gap: 10px;
+  padding: 6px 8px;
+  background: #0e1828;
+  border-top: 1px solid #050d1a;
+}
+
+.knobGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.knobLabel {
+  color: #1a5a8a;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  min-width: 24px;
+}
+
+.knob {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: #050d1a;
+  border: 1px solid #0a2a4a;
+  outline: none;
+  cursor: pointer;
+}
+
+.knob::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 12px;
+  background: #2299ff;
+  border: 1px solid #0055cc;
+  cursor: pointer;
+}
+
+.knob::-moz-range-thumb {
+  width: 10px;
+  height: 12px;
+  background: #2299ff;
+  border: 1px solid #0055cc;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+/* Transport */
+.transport {
+  display: flex;
+  gap: 3px;
+  padding: 6px 8px;
+  background: #0d1724;
+  border-top: 1px solid #050d1a;
+}
+
+.tBtn {
+  flex: 1;
+  height: 30px;
+  background: #111d2e;
+  border: 1px solid #1a3a5a;
+  color: #335577;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition:
+    background 0.1s,
+    color 0.1s;
+}
+
+.tBtn:hover {
+  background: #162842;
+  color: #4db8ff;
+}
+
+.tBtn:active {
+  background: #051428;
+}
+
+.playBtn {
+  flex: 1.6;
+  font-size: 16px;
+}
+
+.tActive {
+  color: #4db8ff !important;
+  background: #051428 !important;
+  box-shadow: inset 0 0 8px #002255;
+}
+
+/* Mode row */
+.modeRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  background: #0e1828;
+  border-top: 1px solid #050d1a;
+}
+
+.modeBtn {
+  background: #111d2e;
+  border: 1px solid #1a3a5a;
+  color: #224466;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.8px;
+  padding: 3px 7px;
+  cursor: pointer;
+  transition:
+    color 0.1s,
+    background 0.1s;
+}
+
+.modeBtn:hover {
+  color: #4db8ff;
+}
+
+.modeOn {
+  color: #4db8ff !important;
+  background: #051428 !important;
+  border-color: #0055aa !important;
+  text-shadow: 0 0 5px #2299ff;
+}
+
+.modeSpacer {
+  flex: 1;
+}
+
+/* ── EQUALIZER ── */
+.equalizer {
+  background: #0d1828;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.eqBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px 4px;
+  gap: 0;
+  background: #0d1828;
+  overflow: hidden;
+}
+
+/* Top control row: ON / AUTO / curve / PRESETS */
+.eqControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  flex-shrink: 0;
+}
+
+.eqBtn {
+  background: #0a1e36;
+  border: 1px solid #1a3a5a;
+  color: #336688;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.8px;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: color 0.1s;
+  flex-shrink: 0;
+}
+
+.eqBtn:hover {
+  color: #4db8ff;
+}
+
+/* SVG curve preview between buttons and PRESETS */
+.eqCurve {
+  flex: 1;
+  height: 28px;
+}
+
+/* dB labels + bands row */
+.eqMain {
+  flex: 1;
+  display: flex;
+  gap: 0;
+  min-height: 0;
+}
+
+/* Left dB axis */
+.eqDbAxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 6px 20px 0;
+  flex-shrink: 0;
+}
+
+.eqDbLabel {
+  color: #4477aa;
+  font-size: 8px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* All band columns */
+.eqBands {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+  min-height: 0;
+}
+
+.eqBand {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 0;
+}
+
+/* Colored bar track behind each fader */
+.eqTrack {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* The gradient bar fill (background column) */
+.eqBarFill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  border-radius: 1px;
+  /* top=green, mid=yellow, bottom=orange — Winamp classic */
+  background: linear-gradient(
+    to bottom,
+    #00cc44 0%,
+    #aacc00 35%,
+    #ffcc00 55%,
+    #ff8800 80%,
+    #ff4400 100%
+  );
+  opacity: 0.35;
+}
+
+/* The actual range input sits on top */
+.eqFader {
+  position: relative;
+  z-index: 1;
+  width: 6px;
+  height: 100%;
+  cursor: pointer;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  -webkit-appearance: slider-vertical;
+  appearance: slider-vertical;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.eqFader::-webkit-slider-runnable-track {
+  background: transparent;
+  width: 6px;
+}
+
+.eqFader::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 9px;
+  background: linear-gradient(180deg, #99ccff 0%, #4488cc 40%, #2266aa 100%);
+  border: 1px solid #88bbee;
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px #00112266;
+}
+
+.eqFader::-moz-range-thumb {
+  width: 22px;
+  height: 9px;
+  background: linear-gradient(180deg, #99ccff 0%, #4488cc 40%, #2266aa 100%);
+  border: 1px solid #88bbee;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.eqLabel {
+  color: #336688;
+  font-size: 8px;
+  letter-spacing: 0.3px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ── PLAYLIST ── */
+.playlist {
+  flex-shrink: 0;
+  height: 35%;
+  display: flex;
+  flex-direction: column;
+  background: #0d1724;
+  border-bottom: 2px solid #000;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.plList {
+  flex: 1;
+  overflow-y: auto;
+  background: #000;
+  padding: 4px 0;
+  min-height: 0;
+}
+
+.plList::-webkit-scrollbar {
+  width: 10px;
+  background: #050d1a;
+}
+
+.plList::-webkit-scrollbar-thumb {
+  background: #0a2a4a;
+  border: 1px solid #051428;
+}
+
+.plEmpty {
+  color: #0a2a4a;
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.plRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  color: #1a5a8a;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  transition:
+    background 0.1s,
+    color 0.1s;
+  border-bottom: 1px solid #050d1a;
+}
+
+.plRow:hover {
+  background: #050d1a;
+  color: #4db8ff;
+}
+
+.plActive {
+  background: #051428 !important;
+  color: #4db8ff !important;
+  border-left: 3px solid #2299ff;
+}
+
+.plIdx {
+  color: #0a3a5a;
+  min-width: 22px;
+  flex-shrink: 0;
+  font-size: 10px;
+}
+
+.plName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.plDur {
+  color: #0a3a5a;
+  flex-shrink: 0;
+  font-family: "Courier New", monospace;
+  font-size: 10px;
+}
+
+.plFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: #0e1828;
+  border-top: 2px solid #000;
+  flex-shrink: 0;
+}
+
+.plFootLeft,
+.plFootRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.plBtn {
+  background: #111d2e;
+  border: 1px solid #1a3a5a;
+  color: #335577;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition:
+    color 0.1s,
+    background 0.1s;
+}
+
+.plBtn:hover {
+  color: #4db8ff;
+  background: #0d1f38;
+}
+
+.plCount {
+  color: #1a4466;
+  font-size: 10px;
+  font-family: "Courier New", monospace;
+  letter-spacing: 0.5px;
+  margin-right: 6px;
+}
+
+/* ── LYRICS ── */
+.lyrics {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0a1220;
+  border-top: 1px solid #000;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.lyricsBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px;
+  background: #000;
+}
+
+.lyricsBody::-webkit-scrollbar {
+  width: 8px;
+  background: #050d1a;
+}
+
+.lyricsBody::-webkit-scrollbar-thumb {
+  background: #0a2a4a;
+}
+
+.lyricsEmpty {
+  color: #0a2a4a;
+  text-align: center;
+  padding: 20px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.lyricLine {
+  color: #cccccc;
+  font-size: 13px;
+  line-height: 1.9;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 2px 0;
+  border-bottom: 1px solid #050d1a;
+}
+
+.lyricLine:last-child {
+  border-bottom: none;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  .screen {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .leftCol {
+    width: 100%;
+    flex-direction: column;
+    border-right: none;
+    border-bottom: 2px solid #000;
+  }
+
+  .player {
+    width: 100%;
+    border-right: none;
+    border-bottom: 2px solid #000;
+  }
+
+  .equalizer {
+    width: 100%;
+    height: 120px !important;
+    flex: none !important;
+    flex-shrink: 0;
+  }
+
+  .eqCurve {
+    display: none;
+  }
+  .eqDbAxis {
+    display: none;
+  }
+  .eqBands {
+    gap: 1px;
+  }
+  .eqLabel {
+    font-size: 6px;
+  }
+
+  .rightCol {
+    max-width: 100%;
+    height: auto;
+    min-height: 400px;
+  }
+
+  .lyrics {
+    height: auto;
+    min-height: 200px;
+  }
+}
