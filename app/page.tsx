@@ -8,7 +8,7 @@ import Walkman from "./components/Walkman";
 export default function Home() {
   const [currentVerse, setCurrentVerse] = useState<string>("");
   const [displayMode, setDisplayMode] = useState<"winamp" | "walkman">(
-    "winamp",
+    "walkman",
   );
 
   const toggleMode = () => {
