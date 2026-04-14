@@ -291,14 +291,14 @@ export default function WinampPlayer({ onVerseChange }: WinampPlayerProps) {
             >
               ⏮
             </button>
-            <button
+            {/* <button
               className={styles.tBtn}
               onClick={() => {
                 if (audioRef.current) audioRef.current.currentTime -= 5;
               }}
             >
-              ⏪
-            </button>
+              Backward
+            </button> */}
             <button
               className={`${styles.tBtn} ${styles.playBtn} ${isPlaying ? styles.tActive : ""}`}
               onClick={togglePlay}
@@ -308,14 +308,14 @@ export default function WinampPlayer({ onVerseChange }: WinampPlayerProps) {
             <button className={styles.tBtn} onClick={handleStop}>
               ⏹
             </button>
-            <button
+            {/* <button
               className={styles.tBtn}
               onClick={() => {
                 if (audioRef.current) audioRef.current.currentTime += 5;
               }}
             >
-              ⏩
-            </button>
+              ▶▶
+            </button> */}
             <button className={styles.tBtn} onClick={() => fetchTrack(true)}>
               ⏭
             </button>

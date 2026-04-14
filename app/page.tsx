@@ -12,7 +12,7 @@ export default function Home() {
   );
 
   const toggleMode = () => {
-    setDisplayMode((prev) => (prev === "winamp" ? "walkman" : "winamp"));
+    setDisplayMode((prev) => (prev === "walkman" ? "winamp" : "walkman"));
   };
 
   return (
@@ -21,12 +21,12 @@ export default function Home() {
       <DisplayToggle mode={displayMode} onToggle={toggleMode} />
       Conditional Rendering
       <div className="w-full h-full flex items-center justify-center">
-        {displayMode === "winamp" ? (
+        {displayMode === "walkman" ? (
+          <Walkman />
+        ) : (
           <WinampPlayer
             onVerseChange={(verse, track) => setCurrentVerse(verse)}
           />
-        ) : (
-          <Walkman />
         )}
       </div>
     </main>
