@@ -40,6 +40,7 @@ export default function WinampPlayer({ onVerseChange }: WinampPlayerProps) {
   const [volume, setVolume] = useState(80);
   const [balance, setBalance] = useState(0);
   const [seenIds, setSeenIds] = useState<string[]>([]);
+  const [lastId, setLastId] = useState<number>(0);
   const [playlist, setPlaylist] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
   const [shuffle, setShuffle] = useState(false);
@@ -59,10 +60,22 @@ export default function WinampPlayer({ onVerseChange }: WinampPlayerProps) {
       setLoading(true);
       setShouldAutoPlay(autoPlay);
       try {
-        const params = seenIds.length > 0 ? `?seen=${seenIds.join(",")}` : "";
-        const res = await fetch(`/api/track${params}`);
+        const params = new URLSearchParams();
+
+        if (shuffle) {
+          params.set("mode", "shuffle");
+          if (seenIds.length > 0) params.set("seen", seenIds.join(","));
+        } else {
+          params.set("mode", "sequential");
+          params.set("lastId", String(lastId));
+          if (seenIds.length > 0) params.set("seen", seenIds.join(","));
+        }
+
+        const res = await fetch(`/api/track?${params.toString()}`);
         const data: Track = await res.json();
+
         setTrack(data);
+        setLastId(Number(data.trackId));
         setSeenIds((prev) => [...prev, data.trackId]);
         setPlaylist((prev) => [...prev, data]);
         onVerseChange?.(data.verse, data);
@@ -72,7 +85,7 @@ export default function WinampPlayer({ onVerseChange }: WinampPlayerProps) {
         setLoading(false);
       }
     },
-    [seenIds, onVerseChange],
+    [seenIds, lastId, shuffle, onVerseChange],
   );
 
   // Initial load — don't auto-play (let user press play)
@@ -326,7 +339,7 @@ export default function WinampPlayer({ onVerseChange }: WinampPlayerProps) {
               className={`${styles.modeBtn} ${shuffle ? styles.modeOn : ""}`}
               onClick={() => setShuffle((s) => !s)}
             >
-              SHUF
+              SHUFFLE
             </button>
             <button
               className={`${styles.modeBtn} ${repeat ? styles.modeOn : ""}`}
