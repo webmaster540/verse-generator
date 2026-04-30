@@ -1,7 +1,32 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const SEEN_ID_LIMIT = 200;
+
+const s3 = new S3Client({
+  region: process.env.AWS_REGION!,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
+
+// Converts a full S3 URL into a pre-signed URL that expires in 1 hour.
+// Expects audio_url in Supabase to look like:
+//   https://verse-generator-music.s3.amazonaws.com/some/track.mp3
+async function signS3Url(rawUrl: string): Promise<string> {
+  const url = new URL(rawUrl);
+  const key = decodeURIComponent(url.pathname.slice(1)); // decode before passing to S3
+
+  const command = new GetObjectCommand({
+    Bucket: process.env.AWS_S3_BUCKET!,
+    Key: key,
+  });
+
+  return getSignedUrl(s3, command, { expiresIn: 3600 });
+}
 
 export async function GET(request: Request) {
   try {
@@ -21,7 +46,6 @@ export async function GET(request: Request) {
 
     // ── SEQUENTIAL MODE ──
     if (mode === "sequential") {
-      // Try to get the next track after lastId, excluding seen
       let query = supabase
         .from("tracks")
         .select("*")
@@ -68,7 +92,7 @@ export async function GET(request: Request) {
             trackName: resetData.track_name,
             albumName: resetData.album_name,
             albumArt: resetData.album_art,
-            previewUrl: resetData.audio_url,
+            previewUrl: await signS3Url(resetData.audio_url),
             startTime: resetData.start_time,
             endTime: resetData.end_time,
             verse: resetData.verse,
@@ -81,7 +105,7 @@ export async function GET(request: Request) {
           trackName: wrapData.track_name,
           albumName: wrapData.album_name,
           albumArt: wrapData.album_art,
-          previewUrl: wrapData.audio_url,
+          previewUrl: await signS3Url(wrapData.audio_url),
           startTime: wrapData.start_time,
           endTime: wrapData.end_time,
           verse: wrapData.verse,
@@ -94,7 +118,7 @@ export async function GET(request: Request) {
         trackName: data.track_name,
         albumName: data.album_name,
         albumArt: data.album_art,
-        previewUrl: data.audio_url,
+        previewUrl: await signS3Url(data.audio_url),
         startTime: data.start_time,
         endTime: data.end_time,
         verse: data.verse,
@@ -103,7 +127,7 @@ export async function GET(request: Request) {
       });
     }
 
-    // ── SHUFFLE MODE (existing logic) ──
+    // ── SHUFFLE MODE ──
     let countQuery = supabase
       .from("tracks")
       .select("*", { count: "exact", head: true });
@@ -135,7 +159,7 @@ export async function GET(request: Request) {
         trackName: data.track_name,
         albumName: data.album_name,
         albumArt: data.album_art,
-        previewUrl: data.audio_url,
+        previewUrl: await signS3Url(data.audio_url),
         startTime: data.start_time,
         endTime: data.end_time,
         verse: data.verse,
@@ -160,7 +184,7 @@ export async function GET(request: Request) {
       trackName: data.track_name,
       albumName: data.album_name,
       albumArt: data.album_art,
-      previewUrl: data.audio_url,
+      previewUrl: await signS3Url(data.audio_url),
       startTime: data.start_time,
       endTime: data.end_time,
       verse: data.verse,

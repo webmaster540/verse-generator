@@ -25,21 +25,27 @@
 .walkman {
   position: relative;
   z-index: 1;
-  width: 320px;
+  width: 420px;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: stretch;
   background: var(--walkman-body);
   border-radius: 18px 18px 28px 28px;
   box-shadow:
     0 0 0 1px #333,
     0 2px 0 2px #111,
-    0 8px 32px rgba(0,0,0,0.8),
-    0 32px 64px rgba(0,0,0,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.06);
+    0 8px 32px rgba(0, 0, 0, 0.8),
+    0 32px 64px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
   overflow: hidden;
   user-select: none;
 }
 
 /* ── Top edge ── */
 .topEdge {
+  width: 100%;
   height: 28px;
   background: linear-gradient(180deg, #2e2e2e 0%, #1a1a1a 100%);
   display: flex;
@@ -55,7 +61,7 @@
   border-radius: 50%;
   background: #0a0a0a;
   border: 1px solid #444;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .brandLabel {
@@ -79,6 +85,7 @@
 /* ── Cassette window ── */
 .cassetteWindow {
   margin: 0;
+  width: 100%;
   background: #141414;
   border-top: 2px solid #111;
   border-bottom: 2px solid #111;
@@ -100,11 +107,18 @@
 
 /* Inner cassette sheen */
 .cassetteInner::after {
-  content: '';
+  content: "";
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
 }
 
 /* ── Reels ── */
@@ -136,7 +150,7 @@
 
 /* Center hole */
 .reelHub::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 10px;
   height: 10px;
@@ -156,8 +170,12 @@
 }
 
 @keyframes spinReel {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spinning .reelHub {
@@ -194,20 +212,24 @@
 }
 
 @keyframes tapeScroll {
-  from { background-position: 0 0; }
-  to   { background-position: -40px 0; }
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -40px 0;
+  }
 }
 
 .tapeMoving::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(
     90deg,
     transparent 0px,
     transparent 6px,
-    rgba(200,168,75,0.15) 6px,
-    rgba(200,168,75,0.15) 8px
+    rgba(200, 168, 75, 0.15) 6px,
+    rgba(200, 168, 75, 0.15) 8px
   );
   animation: tapeScroll 0.4s linear infinite;
 }
@@ -246,19 +268,23 @@
 /* ── LCD Screen ── */
 .screen {
   margin: 12px 16px;
+  width: 100%;
+  height: 100%;
   background: var(--walkman-screen-bg);
   border: 1px solid #0a2a0a;
   border-radius: 4px;
   box-shadow:
-    inset 0 0 20px rgba(0,0,0,0.8),
-    0 0 12px rgba(57,255,106,0.05);
+    inset 0 0 20px rgba(0, 0, 0, 0.8),
+    0 0 12px rgba(57, 255, 106, 0.05);
   overflow: hidden;
 }
 
 .screenInner {
+  height: 100%;
   padding: 10px 12px 6px;
   min-height: 160px;
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
@@ -266,17 +292,16 @@
 
 /* LCD pixel grid overlay */
 .screenInner::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.1) 2px,
-      rgba(0,0,0,0.1) 3px
-    );
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 3px
+  );
   pointer-events: none;
   z-index: 10;
 }
@@ -297,7 +322,7 @@
   font-size: 42px;
   letter-spacing: 8px;
   color: var(--walkman-screen-text);
-  text-shadow: 0 0 20px rgba(57,255,106,0.5);
+  text-shadow: 0 0 20px rgba(57, 255, 106, 0.5);
   line-height: 1;
 }
 
@@ -310,8 +335,14 @@
 }
 
 @keyframes blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .screenPrompt {
@@ -340,8 +371,16 @@
 }
 
 @keyframes dotPulse {
-  0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
-  40% { opacity: 1; transform: scale(1); }
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .loadingDots span {
@@ -350,26 +389,30 @@
   height: 6px;
   border-radius: 50%;
   background: var(--walkman-screen-text);
-  box-shadow: 0 0 6px rgba(57,255,106,0.6);
+  box-shadow: 0 0 6px rgba(57, 255, 106, 0.6);
   animation: dotPulse 1.4s ease-in-out infinite;
 }
-.loadingDots span:nth-child(2) { animation-delay: 0.2s; }
-.loadingDots span:nth-child(3) { animation-delay: 0.4s; }
+.loadingDots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.loadingDots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 /* Playing */
 .screenPlaying {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   flex: 1;
 }
 
 .screenTrackName {
   font-family: var(--font-display);
-  font-size: 16px;
+  font-size: 20px;
   letter-spacing: 2px;
   color: var(--walkman-screen-text);
-  text-shadow: 0 0 8px rgba(57,255,106,0.4);
+  text-shadow: 0 0 8px rgba(57, 255, 106, 0.4);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -390,7 +433,7 @@
 
 .verseLine {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: 10px;
   line-height: 1.5;
   color: var(--walkman-screen-text);
   letter-spacing: 0.3px;
@@ -416,13 +459,14 @@
 .progressBar {
   height: 100%;
   background: var(--walkman-screen-text);
-  box-shadow: 0 0 4px rgba(57,255,106,0.8);
+  box-shadow: 0 0 4px rgba(57, 255, 106, 0.8);
   border-radius: 1px;
   transition: width 0.1s linear;
 }
 
 /* ── Controls ── */
 .controls {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -440,7 +484,7 @@
   transition: all 0.1s ease;
   box-shadow:
     0 2px 0 #111,
-    inset 0 1px 0 rgba(255,255,255,0.04);
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .controlBtn:active:not(:disabled) {
@@ -474,8 +518,8 @@
   color: #e0bc5c;
   box-shadow:
     0 2px 0 #111,
-    0 0 12px rgba(200,168,75,0.15),
-    inset 0 1px 0 rgba(255,255,255,0.04);
+    0 0 12px rgba(200, 168, 75, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .btnActive {
@@ -484,8 +528,8 @@
   border-color: #1a3a1a;
   box-shadow:
     0 2px 0 #111,
-    0 0 12px rgba(57,255,106,0.1),
-    inset 0 1px 0 rgba(255,255,255,0.02);
+    0 0 12px rgba(57, 255, 106, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 .btnIcon {
@@ -495,6 +539,7 @@
 
 /* ── Bottom edge ── */
 .bottomEdge {
+  width: 100%;
   height: 40px;
   background: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
   border-top: 1px solid #111;
@@ -527,7 +572,7 @@
 }
 
 .batteryDoor::after {
-  content: '';
+  content: "";
   position: absolute;
   right: -4px;
   top: 50%;

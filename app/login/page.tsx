@@ -31,6 +31,7 @@ export default function LoginPage() {
   return (
     <form onSubmit={handleSubmit} className={styles.container}>
       <input
+        id="password"
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
