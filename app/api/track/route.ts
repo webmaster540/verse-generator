@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { LRUCache } from "lru-cache";
 
 const SEEN_ID_LIMIT = 200;
 
+// ── S3 CLIENT ──
 const s3 = new S3Client({
   region: process.env.AWS_REGION!,
   credentials: {
@@ -13,22 +15,56 @@ const s3 = new S3Client({
   },
 });
 
-// Converts a full S3 URL into a pre-signed URL that expires in 1 hour.
-// Expects audio_url in Supabase to look like:
-//   https://verse-generator-music.s3.amazonaws.com/some/track.mp3
+// ── RATE LIMITER ──
+// 30 requests per IP per minute
+const rateLimit = new LRUCache<string, number[]>({
+  max: 500, // track up to 500 unique IPs
+  ttl: 60 * 1000, // 1 minute window
+});
+
+const RATE_LIMIT_MAX = 30;
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const windowMs = 60 * 1000;
+  const timestamps = rateLimit.get(ip) ?? [];
+
+  // Keep only timestamps within the current window
+  const recent = timestamps.filter((t) => now - t < windowMs);
+
+  if (recent.length >= RATE_LIMIT_MAX) return true;
+
+  rateLimit.set(ip, [...recent, now]);
+  return false;
+}
+
+// ── SIGN S3 URL ──
 async function signS3Url(rawUrl: string): Promise<string> {
   const url = new URL(rawUrl);
-  const key = decodeURIComponent(url.pathname.slice(1)); // decode before passing to S3
+  const key = url.pathname.slice(1);
 
   const command = new GetObjectCommand({
     Bucket: process.env.AWS_S3_BUCKET!,
     Key: key,
   });
 
-  return getSignedUrl(s3, command, { expiresIn: 3600 });
+  return getSignedUrl(s3, command, { expiresIn: 300 });
 }
 
 export async function GET(request: Request) {
+  // ── RATE LIMIT CHECK ──
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip") ??
+    "unknown";
+
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { error: "Too many requests. Please slow down." },
+      { status: 429 },
+    );
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const mode = searchParams.get("mode") ?? "shuffle";
@@ -88,11 +124,16 @@ export async function GET(request: Request) {
               { status: 404 },
             );
 
+          const [previewUrl, albumArt] = await Promise.all([
+            signS3Url(resetData.audio_url),
+            signS3Url(resetData.album_art),
+          ]);
+
           return NextResponse.json({
             trackName: resetData.track_name,
             albumName: resetData.album_name,
-            albumArt: resetData.album_art,
-            previewUrl: await signS3Url(resetData.audio_url),
+            albumArt,
+            previewUrl,
             startTime: resetData.start_time,
             endTime: resetData.end_time,
             verse: resetData.verse,
@@ -101,11 +142,16 @@ export async function GET(request: Request) {
           });
         }
 
+        const [previewUrl, albumArt] = await Promise.all([
+          signS3Url(wrapData.audio_url),
+          signS3Url(wrapData.album_art),
+        ]);
+
         return NextResponse.json({
           trackName: wrapData.track_name,
           albumName: wrapData.album_name,
-          albumArt: wrapData.album_art,
-          previewUrl: await signS3Url(wrapData.audio_url),
+          albumArt,
+          previewUrl,
           startTime: wrapData.start_time,
           endTime: wrapData.end_time,
           verse: wrapData.verse,
@@ -114,11 +160,16 @@ export async function GET(request: Request) {
         });
       }
 
+      const [previewUrl, albumArt] = await Promise.all([
+        signS3Url(data.audio_url),
+        signS3Url(data.album_art),
+      ]);
+
       return NextResponse.json({
         trackName: data.track_name,
         albumName: data.album_name,
-        albumArt: data.album_art,
-        previewUrl: await signS3Url(data.audio_url),
+        albumArt,
+        previewUrl,
         startTime: data.start_time,
         endTime: data.end_time,
         verse: data.verse,
@@ -155,11 +206,16 @@ export async function GET(request: Request) {
 
       if (error) throw error;
 
+      const [previewUrl, albumArt] = await Promise.all([
+        signS3Url(data.audio_url),
+        signS3Url(data.album_art),
+      ]);
+
       return NextResponse.json({
         trackName: data.track_name,
         albumName: data.album_name,
-        albumArt: data.album_art,
-        previewUrl: await signS3Url(data.audio_url),
+        albumArt,
+        previewUrl,
         startTime: data.start_time,
         endTime: data.end_time,
         verse: data.verse,
@@ -180,11 +236,16 @@ export async function GET(request: Request) {
     const { data, error } = await dataQuery.single();
     if (error) throw error;
 
+    const [previewUrl, albumArt] = await Promise.all([
+      signS3Url(data.audio_url),
+      signS3Url(data.album_art),
+    ]);
+
     return NextResponse.json({
       trackName: data.track_name,
       albumName: data.album_name,
-      albumArt: data.album_art,
-      previewUrl: await signS3Url(data.audio_url),
+      albumArt,
+      previewUrl,
       startTime: data.start_time,
       endTime: data.end_time,
       verse: data.verse,
