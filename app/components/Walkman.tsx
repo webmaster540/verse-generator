@@ -26,6 +26,14 @@ export default function Walkman() {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const [seenIds, setSeenIds] = useState<string[]>([]);
 
+  // ── URL HELPER ──
+  // Ensures the frontend always points to CloudFront
+  // const getMediaUrl = (path: string) => {
+  //   const cfBase = process.env.NEXT_PUBLIC_CLOUDFRONT_URL || "";
+  //   const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  //   return `${cfBase}${cleanPath}`;
+  // };
+
   const unlockAudio = useCallback(() => {
     if (!audioCtxRef.current) {
       audioCtxRef.current = new AudioContext();
@@ -64,7 +72,7 @@ export default function Walkman() {
       setTrack(data);
       setState("playing");
     } catch {
-      setError("Could not load track.");
+      setError("NO TAPE DETECTED");
       setState("idle");
     }
   }, [unlockAudio, stopCurrentAudio, seenIds]);
@@ -75,12 +83,6 @@ export default function Walkman() {
     const startTime = track.startTime ?? 0;
     const endTime = track.endTime ?? 30;
     const duration = endTime - startTime;
-
-    if (duration <= 0) {
-      setError("Invalid start/end time in track data.");
-      setState("done");
-      return;
-    }
 
     const audio = new Audio(track.previewUrl);
     audioRef.current = audio;
@@ -99,12 +101,6 @@ export default function Walkman() {
       }
     };
 
-    const onError = () => {
-      cancelAnimationFrame(rafRef.current);
-      setError("Audio file not found. Check the track URL.");
-      setState("done");
-    };
-
     const tick = () => {
       const elapsed = audio.currentTime - startTime;
       const pct = Math.min(elapsed / duration, 1);
@@ -117,16 +113,16 @@ export default function Walkman() {
         setState("done");
         return;
       }
-
       rafRef.current = requestAnimationFrame(tick);
     };
 
     audio.addEventListener("loadedmetadata", onReady);
-    audio.addEventListener("error", onError);
+    audio.addEventListener("error", () => {
+      setError("READ ERROR");
+      setState("done");
+    });
 
     return () => {
-      audio.removeEventListener("loadedmetadata", onReady);
-      audio.removeEventListener("error", onError);
       cancelAnimationFrame(rafRef.current);
       audio.pause();
       audio.src = "";
@@ -140,24 +136,36 @@ export default function Walkman() {
 
   return (
     <div className={styles.scene}>
+      {/* Dynamic Blurred Background */}
+      {track?.albumArt && (
+        <div
+          className={styles.albumArtBg}
+          style={{ backgroundImage: `url(${track.albumArt})` }}
+        />
+      )}
+
       <div className={styles.walkman}>
+        {/* Physical Volume Knob Decoration */}
+        <div className={styles.volumeWheel} />
+
         <div className={styles.topEdge}>
           <div className={styles.headphoneJack} />
-          <span className={styles.brandLabel}>WALKMAN</span>
+          <span className={styles.brandLabel}>HOV-MAN</span>
           <div className={styles.holdSwitch}>HOLD</div>
         </div>
 
+        {/* Cassette Mechanical Area */}
         <div className={styles.cassetteWindow}>
           <div className={styles.cassetteInner}>
             <div
-              className={`${styles.reel} ${styles.reelLeft} ${isPlaying ? styles.spinning : ""}`}
+              className={`${styles.reel} ${isPlaying ? styles.spinning : ""}`}
             >
               <div className={styles.reelHub}>
-                {[0, 1, 2, 3, 4, 5].map((i) => (
+                {[0, 60, 120, 180, 240, 300].map((deg) => (
                   <div
-                    key={i}
+                    key={deg}
                     className={styles.reelSpoke}
-                    style={{ transform: `rotate(${i * 60}deg)` }}
+                    style={{ transform: `rotate(${deg}deg)` }}
                   />
                 ))}
               </div>
@@ -172,42 +180,35 @@ export default function Walkman() {
             </div>
 
             <div
-              className={`${styles.reel} ${styles.reelRight} ${isPlaying ? styles.spinning : ""}`}
+              className={`${styles.reel} ${isPlaying ? styles.spinning : ""}`}
             >
               <div className={styles.reelHub}>
-                {[0, 1, 2, 3, 4, 5].map((i) => (
+                {[0, 60, 120, 180, 240, 300].map((deg) => (
                   <div
-                    key={i}
+                    key={deg}
                     className={styles.reelSpoke}
-                    style={{ transform: `rotate(${i * 60}deg)` }}
+                    style={{ transform: `rotate(${deg}deg)` }}
                   />
                 ))}
               </div>
               <div className={styles.reelOuter} />
             </div>
           </div>
-
-          <div className={styles.cassetteLabel}>
-            {track && (
-              <span className={styles.cassetteLabelAlbum}>
-                {track.albumName}
-              </span>
-            )}
-          </div>
         </div>
 
+        {/* Digital Lens/Screen Area */}
         <div className={styles.screen}>
           <div className={styles.screenInner}>
+            {/* 1. STARTING SCREEN (Idle State) */}
             {isIdle && (
               <div className={styles.screenIdle}>
                 <div className={styles.screenBrand}>JAY-Z</div>
-                <div className={styles.screenSub}>
-                  BLUEPRINT · BLACK ALBUM · REASONABLE DOUBT
-                </div>
+                <div className={styles.screenSub}>VERSE GENERATOR</div>
                 <div className={styles.screenPrompt}>PRESS PLAY</div>
               </div>
             )}
 
+            {/* 2. LOADING SCREEN */}
             {isLoading && (
               <div className={styles.screenLoading}>
                 <div className={styles.loadingDots}>
@@ -215,14 +216,27 @@ export default function Walkman() {
                   <span />
                   <span />
                 </div>
-                <div className={styles.screenSub}>LOADING TRACK</div>
+                <div className={styles.screenSub}>READING TAPE...</div>
               </div>
             )}
 
+            {/* 3. ACTIVE PLAYER VIEW (Playing or Done) */}
             {(isPlaying || isDone) && track && (
-              <div className={styles.screenPlaying}>
-                <div className={styles.screenTrackName}>{track.trackName}</div>
-                <div className={styles.screenDivider} />
+              <>
+                <div className={styles.trackHeader}>
+                  <img
+                    src={track.albumArt}
+                    className={styles.albumArtSmall}
+                    alt="Art"
+                  />
+                  <div className={styles.trackInfoText}>
+                    <span className={styles.artistName}>JAY-Z</span>
+                    <span className={styles.screenTrackName}>
+                      {track.trackName}
+                    </span>
+                  </div>
+                </div>
+
                 <div className={styles.verse}>
                   {track.verse.split("\n").map((line, i) => (
                     <div key={i} className={styles.verseLine}>
@@ -230,11 +244,13 @@ export default function Walkman() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </>
             )}
 
+            {/* 4. ERROR VIEW */}
             {error && <div className={styles.screenError}>{error}</div>}
 
+            {/* Always show Progress Bar frame, but maybe keep it empty if idle */}
             <div className={styles.progressTrack}>
               <div
                 className={styles.progressBar}
@@ -244,50 +260,34 @@ export default function Walkman() {
           </div>
         </div>
 
+        {/* Tactile Control Panel */}
         <div className={styles.controls}>
-          <button
-            className={`${styles.controlBtn} ${styles.btnSmall}`}
-            disabled
-          >
+          <button className={styles.btnCircle} disabled>
             <span className={styles.btnIcon}>◀◀</span>
           </button>
 
-          {/* Only disabled while loading — can skip anytime during playback */}
           <button
-            className={`${styles.controlBtn} ${styles.btnMain} ${isPlaying ? styles.btnActive : ""}`}
+            className={`${styles.btnCircle} ${styles.btnPlay} ${isPlaying ? styles.btnActive : ""}`}
             onClick={fetchTrack}
             disabled={isLoading}
           >
-            {isIdle && <span>▶ PLAY</span>}
-            {isLoading && <span>···</span>}
-            {isPlaying && <span>⇄ SHUFFLE</span>}
-            {isDone && <span>⇄ SHUFFLE</span>}
+            {isLoading ? "..." : isPlaying || isDone ? "SHUFFLE" : "PLAY"}
           </button>
 
-          <button
-            className={`${styles.controlBtn} ${styles.btnSmall}`}
-            disabled
-          >
+          <button className={styles.btnCircle} disabled>
             <span className={styles.btnIcon}>▶▶</span>
           </button>
         </div>
 
         <div className={styles.bottomEdge}>
           <div className={styles.speakerGrill}>
-            {Array.from({ length: 12 }).map((_, i) => (
+            {Array.from({ length: 10 }).map((_, i) => (
               <div key={i} className={styles.grillSlot} />
             ))}
           </div>
           <div className={styles.batteryDoor} />
         </div>
       </div>
-
-      {track?.albumArt && (
-        <div
-          className={styles.albumArtBg}
-          style={{ backgroundImage: `url(${track.albumArt})` }}
-        />
-      )}
     </div>
   );
 }

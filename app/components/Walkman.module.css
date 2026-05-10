@@ -1,6 +1,6 @@
 /* Walkman.module.css */
 
-/* ── Scene & positioning ── */
+/* ── Scene ── */
 .scene {
   position: relative;
   display: flex;
@@ -8,6 +8,8 @@
   justify-content: center;
   width: 100vw;
   height: 100vh;
+  background: #000;
+  overflow: hidden;
 }
 
 .albumArtBg {
@@ -15,161 +17,103 @@
   inset: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(60px) brightness(0.15) saturate(1.5);
+  filter: blur(80px) brightness(0.2);
   transform: scale(1.1);
   z-index: 0;
   transition: background-image 1s ease;
 }
 
-/* ── Main body ── */
+/* ── The Hardware Body ── */
 .walkman {
   position: relative;
   z-index: 1;
-  width: 420px;
-  height: 90%;
+  width: 380px;
+  height: 600px;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border-radius: 20px;
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.8),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid #000;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: stretch;
-  background: var(--walkman-body);
-  border-radius: 18px 18px 28px 28px;
-  box-shadow:
-    0 0 0 1px #333,
-    0 2px 0 2px #111,
-    0 8px 32px rgba(0, 0, 0, 0.8),
-    0 32px 64px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-  user-select: none;
 }
 
-/* ── Top edge ── */
+.volumeWheel {
+  position: absolute;
+  right: -8px;
+  top: 60%;
+  width: 12px;
+  height: 60px;
+  background: repeating-linear-gradient(0deg, #111 0px, #111 2px, #333 3px);
+  border-radius: 2px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Top Section ── */
 .topEdge {
-  width: 100%;
-  height: 28px;
-  background: linear-gradient(180deg, #2e2e2e 0%, #1a1a1a 100%);
+  padding: 15px 20px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 0 14px;
-  border-bottom: 1px solid #111;
-}
-
-.headphoneJack {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #0a0a0a;
-  border: 1px solid #444;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+  align-items: center;
 }
 
 .brandLabel {
-  font-family: var(--font-display);
-  font-size: 13px;
-  letter-spacing: 4px;
-  color: var(--walkman-accent);
-  text-shadow: 0 0 8px rgba(75, 152, 200, 0.4);
+  font-family: sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #555; /* Subtle engraved look */
 }
 
 .holdSwitch {
-  font-family: var(--font-mono);
-  font-size: 7px;
-  letter-spacing: 1px;
-  color: #555;
+  font-size: 8px;
+  color: #444;
   border: 1px solid #333;
-  padding: 1px 4px;
-  border-radius: 2px;
+  padding: 2px 5px;
+  border-radius: 3px;
 }
 
-/* ── Cassette window ── */
+/* ── The Cassette Window ── */
 .cassetteWindow {
-  margin: 0;
-  width: 100%;
-  background: #141414;
-  border-top: 2px solid #111;
-  border-bottom: 2px solid #111;
-  padding: 16px 16px 8px;
+  padding: 0 20px;
 }
 
 .cassetteInner {
+  height: 100px;
+  background: #0a0a0a;
+  border-radius: 8px;
+  border: 2px solid #1a1a1a;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 80px;
-  background: #0c0c0c;
-  border: 1px solid #2a2a2a;
-  border-radius: 6px;
-  padding: 8px 12px;
+  justify-content: space-around;
   position: relative;
   overflow: hidden;
 }
 
-/* Inner cassette sheen */
-.cassetteInner::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.05),
-    transparent
-  );
-}
-
-/* ── Reels ── */
 .reel {
-  position: relative;
-  width: 52px;
-  height: 52px;
-  flex-shrink: 0;
-}
-
-.reelOuter {
-  position: absolute;
-  inset: 0;
+  width: 50px;
+  height: 50px;
+  border: 2px solid #222;
   border-radius: 50%;
-  border: 3px solid #333;
-  background: transparent;
+  position: relative;
 }
 
 .reelHub {
-  position: absolute;
-  inset: 8px;
-  border-radius: 50%;
-  background: #1e1e1e;
-  border: 2px solid #2e2e2e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Center hole */
-.reelHub::after {
-  content: "";
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #0a0a0a;
-  border: 1px solid #333;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .reelSpoke {
   position: absolute;
-  width: 1px;
-  height: 100%;
-  background: #2e2e2e;
-  top: 0;
   left: 50%;
-  transform-origin: center center;
+  width: 2px;
+  height: 100%;
+  background: #333;
 }
 
-@keyframes spinReel {
+@keyframes spin {
   from {
     transform: rotate(0deg);
   }
@@ -177,192 +121,81 @@
     transform: rotate(360deg);
   }
 }
-
 .spinning .reelHub {
-  animation: spinReel 1.2s linear infinite;
+  animation: spin 2s linear infinite;
 }
 
-/* Tape guide (center area between reels) */
-.tapeGuide {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 0 8px;
-}
-
-.tapeHead {
-  width: 28px;
-  height: 8px;
-  background: #2a2a2a;
-  border: 1px solid #3a3a3a;
-  border-radius: 2px;
-}
-
-.tapeLine {
-  width: 100%;
-  height: 2px;
-  background: #1a1a1a;
-  border-top: 1px solid #333;
-  border-bottom: 1px solid #111;
-  position: relative;
-  overflow: hidden;
-}
-
-@keyframes tapeScroll {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: -40px 0;
-  }
-}
-
-.tapeMoving::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    transparent 6px,
-    rgba(200, 168, 75, 0.15) 6px,
-    rgba(200, 168, 75, 0.15) 8px
-  );
-  animation: tapeScroll 0.4s linear infinite;
-}
-
-/* Cassette label */
-.cassetteLabel {
-  margin-top: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 0 2px;
-}
-
-.cassetteLabelTrack {
-  font-family: var(--font-display);
-  font-size: 14px;
-  letter-spacing: 2px;
-  color: var(--walkman-accent);
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.cassetteLabelAlbum {
-  font-family: var(--font-mono);
-  font-size: 7px;
-  color: #555;
-  letter-spacing: 1px;
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ── LCD Screen ── */
+/* ── The Screen (The Star of the Show) ── */
 .screen {
-  margin: 12px 16px;
-  width: 100%;
-  height: 100%;
-  background: var(--walkman-screen-bg);
-  border: 1px solid #0a2a0a;
-  border-radius: 4px;
-  box-shadow:
-    inset 0 0 20px rgba(0, 0, 0, 0.8),
-    0 0 12px rgba(57, 255, 106, 0.05);
+  margin: 20px;
+  flex: 1;
+  background: #0d0f0d; /* Dark digital green-black */
+  border-radius: 10px;
+  border: 4px solid #111;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 1);
+  position: relative;
   overflow: hidden;
 }
 
 .screenInner {
+  padding: 15px;
   height: 100%;
-  padding: 10px 12px 6px;
-  min-height: 160px;
   display: flex;
-  flex-grow: 1;
   flex-direction: column;
-  justify-content: space-between;
-  position: relative;
 }
 
-/* LCD pixel grid overlay */
-.screenInner::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.1) 2px,
-    rgba(0, 0, 0, 0.1) 3px
-  );
-  pointer-events: none;
-  z-index: 10;
-}
-
-/* ── Screen states ── */
+/* Starting Screen Layout */
 .screenIdle {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  flex: 1;
-  padding: 16px 0;
+  flex: 1; /* Fills the screen */
+  text-align: center;
+  gap: 10px;
 }
 
 .screenBrand {
-  font-family: var(--font-display);
-  font-size: 42px;
-  letter-spacing: 8px;
-  color: var(--walkman-screen-text);
-  text-shadow: 0 0 20px rgba(57, 255, 106, 0.5);
-  line-height: 1;
+  font-size: 32px;
+  font-weight: 900;
+  color: #e0e0e0;
+  letter-spacing: 6px;
+  text-shadow: 0 0 15px rgba(57, 255, 106, 0.4);
 }
 
 .screenSub {
-  font-family: var(--font-mono);
-  font-size: 7px;
-  color: var(--walkman-screen-dim);
-  letter-spacing: 1px;
-  text-align: center;
+  font-size: 9px;
+  color: #e0e0e0;
+  opacity: 0.5;
+  letter-spacing: 2px;
 }
 
 @keyframes blink {
   0%,
-  49% {
+  100% {
     opacity: 1;
   }
-  50%,
-  100% {
+  50% {
     opacity: 0;
   }
 }
 
 .screenPrompt {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 3px;
-  color: var(--walkman-screen-text);
-  animation: blink 1.2s step-end infinite;
-  margin-top: 8px;
+  margin-top: 15px;
+  font-size: 12px;
+  color: #e0e0e0;
+  letter-spacing: 1px;
+  animation: blink 1.5s infinite; /* That classic "Insert Coin" vibe */
 }
 
-/* Loading */
+/* Loading Dots Animation */
 .screenLoading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
   flex: 1;
-  padding: 16px 0;
+  gap: 15px;
 }
 
 .loadingDots {
@@ -370,28 +203,14 @@
   gap: 8px;
 }
 
-@keyframes dotPulse {
-  0%,
-  80%,
-  100% {
-    opacity: 0.2;
-    transform: scale(0.8);
-  }
-  40% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
 .loadingDots span {
-  display: block;
   width: 6px;
   height: 6px;
+  background: #e0e0e0;
   border-radius: 50%;
-  background: var(--walkman-screen-text);
-  box-shadow: 0 0 6px rgba(57, 255, 106, 0.6);
-  animation: dotPulse 1.4s ease-in-out infinite;
+  animation: pulse 1s infinite alternate;
 }
+
 .loadingDots span:nth-child(2) {
   animation-delay: 0.2s;
 }
@@ -399,186 +218,111 @@
   animation-delay: 0.4s;
 }
 
-/* Playing */
-.screenPlaying {
+@keyframes pulse {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.5);
+    opacity: 0.3;
+  }
+}
+
+/* ── Track Header (Inside Screen) ── */
+.trackHeader {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.albumArtSmall {
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  border: 1px solid #222;
+}
+
+.trackInfoText {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1;
+}
+
+.artistName {
+  font-size: 10px;
+  color: #e0e0e0; /* Matrix green */
+  opacity: 0.6;
 }
 
 .screenTrackName {
-  font-family: var(--font-display);
-  font-size: 20px;
-  letter-spacing: 2px;
-  color: var(--walkman-screen-text);
-  text-shadow: 0 0 8px rgba(57, 255, 106, 0.4);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 16px;
+  font-weight: bold;
+  color: #e0e0e0;
 }
 
-.screenDivider {
-  height: 1px;
-  background: var(--walkman-screen-dim);
-  margin: 2px 0;
-}
-
+/* ── Verse/Lyrics ── */
 .verse {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
   flex: 1;
+  font-family: monospace;
+  font-size: 11px;
+  color: #e0e0e0;
+  line-height: 1.6;
+  opacity: 0.8;
+  overflow-y: auto;
 }
 
-.verseLine {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  line-height: 1.5;
-  color: var(--walkman-screen-text);
-  letter-spacing: 0.3px;
-}
-
-.screenError {
-  font-family: var(--font-mono);
-  font-size: 8px;
-  color: #ff4444;
-  text-align: center;
-  padding: 20px 0;
-}
-
-/* Progress bar */
+/* ── Progress Bar ── */
 .progressTrack {
-  height: 2px;
-  background: var(--walkman-screen-dim);
-  border-radius: 1px;
-  margin-top: 8px;
-  overflow: hidden;
+  height: 4px;
+  background: #1a1a1a;
+  border-radius: 2px;
+  margin-top: 10px;
 }
 
 .progressBar {
   height: 100%;
-  background: var(--walkman-screen-text);
-  box-shadow: 0 0 4px rgba(57, 255, 106, 0.8);
-  border-radius: 1px;
-  transition: width 0.1s linear;
+  background: #e0e0e0;
+  box-shadow: 0 0 10px #e0e0e0;
 }
 
-/* ── Controls ── */
+/* ── Controls (The Big Circular Buttons) ── */
 .controls {
-  width: 100%;
+  padding: 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px 10px;
-  gap: 8px;
+  justify-content: center;
+  gap: 20px;
+  background: #151515;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
-.controlBtn {
-  background: var(--walkman-btn);
-  border: 1px solid #333;
-  border-radius: 6px;
-  color: #888;
-  font-family: var(--font-mono);
+.btnCircle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #222, #111);
+  border: 1px solid #000;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.1s ease;
   box-shadow:
-    0 2px 0 #111,
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    4px 4px 10px rgba(0, 0, 0, 0.5),
+    -1px -1px 2px rgba(255, 255, 255, 0.05);
 }
 
-.controlBtn:active:not(:disabled) {
-  transform: translateY(1px);
-  box-shadow: 0 1px 0 #111;
+.btnPlay {
+  width: 70px;
+  height: 70px;
+  color: #e0bc5c; /* Gold accent */
+  font-weight: bold;
+  font-size: 10px;
 }
 
-.controlBtn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.btnSmall {
-  width: 44px;
-  height: 36px;
-  font-size: 9px;
-  letter-spacing: 1px;
-}
-
-.btnMain {
-  flex: 1;
-  height: 40px;
-  font-size: 11px;
-  letter-spacing: 2px;
-  color: var(--walkman-accent);
-  border-color: var(--walkman-accent-dim);
-}
-
-.btnMain:hover:not(:disabled) {
-  background: #2e2e2e;
-  color: #e0bc5c;
-  box-shadow:
-    0 2px 0 #111,
-    0 0 12px rgba(200, 168, 75, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.btnActive {
-  background: #1a1a1a;
-  color: var(--walkman-screen-text);
-  border-color: #1a3a1a;
-  box-shadow:
-    0 2px 0 #111,
-    0 0 12px rgba(57, 255, 106, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.02);
-}
-
-.btnIcon {
-  font-size: 8px;
-  letter-spacing: 0;
-}
-
-/* ── Bottom edge ── */
-.bottomEdge {
-  width: 100%;
-  height: 40px;
-  background: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
-  border-top: 1px solid #111;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-}
-
-.speakerGrill {
-  display: flex;
-  gap: 3px;
-  align-items: center;
-}
-
-.grillSlot {
-  width: 1px;
-  height: 14px;
-  background: #0e0e0e;
-  border-left: 1px solid #2a2a2a;
-}
-
-.batteryDoor {
-  width: 40px;
-  height: 20px;
-  border: 1px solid #2a2a2a;
-  border-radius: 3px;
-  background: #111;
-  position: relative;
-}
-
-.batteryDoor::after {
-  content: "";
-  position: absolute;
-  right: -4px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 8px;
-  background: #2a2a2a;
-  border-radius: 0 2px 2px 0;
+.btnCircle:active {
+  box-shadow: inset 2px 2px 5px #000;
+  transform: scale(0.98);
 }

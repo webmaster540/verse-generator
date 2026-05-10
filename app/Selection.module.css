@@ -1,0 +1,139 @@
+/* Selection.module.css */
+
+.container {
+  width: 100vw;
+  height: 100vh;
+  background: #050d1a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+    linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.02),
+      rgba(0, 255, 0, 0.01),
+      rgba(0, 0, 255, 0.02)
+    );
+  background-size:
+    100% 2px,
+    3px 100%;
+  z-index: 100;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  z-index: 20;
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-style: italic;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.subtitle {
+  font-size: 10px;
+  color: #4db8ff;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  margin-top: 10px;
+  opacity: 0.8;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column; /* FORCES VERTICAL STACK */
+  gap: 15px;
+  width: 100%;
+  max-width: 320px; /* Keeps the column narrow and tight */
+  z-index: 20;
+}
+
+.card {
+  width: 100%;
+  background: #111d2e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardWalkman:hover {
+  border-color: #39ff6a;
+  box-shadow: 0 0 20px rgba(57, 255, 106, 0.2);
+}
+
+.cardWalkman:hover .cardTitle {
+  color: #39ff6a;
+}
+
+.cardWinamp:hover {
+  border-color: #4db8ff;
+  box-shadow: 0 0 20px rgba(77, 184, 255, 0.2);
+}
+
+.cardWinamp:hover .cardTitle {
+  color: #4db8ff;
+}
+
+.cardLabel {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.cardTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 0.1em;
+  margin: 0;
+  transition: color 0.2s ease;
+}
+
+.exitBtn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.3);
+  padding: 6px 16px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  z-index: 110;
+  backdrop-filter: blur(5px);
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 2.5rem;
+  }
+  .grid {
+    max-width: 280px;
+  }
+}

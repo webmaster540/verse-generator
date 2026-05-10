@@ -1,35 +1,23 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { LRUCache } from "lru-cache";
 
+// ── CONFIGURATION ──
 const SEEN_ID_LIMIT = 200;
-
-// ── S3 CLIENT ──
-const s3 = new S3Client({
-  region: process.env.AWS_REGION!,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
+const RATE_LIMIT_MAX = 30;
 
 // ── RATE LIMITER ──
-// 30 requests per IP per minute
+// Tracks up to 500 unique IPs for 1 minute
 const rateLimit = new LRUCache<string, number[]>({
-  max: 500, // track up to 500 unique IPs
-  ttl: 60 * 1000, // 1 minute window
+  max: 500,
+  ttl: 60 * 1000,
 });
-
-const RATE_LIMIT_MAX = 30;
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
   const windowMs = 60 * 1000;
   const timestamps = rateLimit.get(ip) ?? [];
 
-  // Keep only timestamps within the current window
   const recent = timestamps.filter((t) => now - t < windowMs);
 
   if (recent.length >= RATE_LIMIT_MAX) return true;
@@ -38,21 +26,21 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
-// ── SIGN S3 URL ──
-async function signS3Url(rawUrl: string): Promise<string> {
-  const url = new URL(rawUrl);
-  const key = url.pathname.slice(1);
+// ── CLOUDFRONT URL GENERATOR ──
+function getMediaUrl(pathFromDb: string): string {
+  const cfBase = process.env.CLOUDFRONT_URL;
 
-  const command = new GetObjectCommand({
-    Bucket: process.env.AWS_S3_BUCKET!,
-    Key: key,
-  });
+  if (!cfBase) return pathFromDb;
 
-  return getSignedUrl(s3, command, { expiresIn: 300 });
+  // This ensures there is exactly one slash between the domain and the path
+  const cleanBase = cfBase.endsWith("/") ? cfBase.slice(0, -1) : cfBase;
+  const cleanPath = pathFromDb.startsWith("/") ? pathFromDb : `/${pathFromDb}`;
+
+  return `${cleanBase}${cleanPath}`;
 }
 
 export async function GET(request: Request) {
-  // ── RATE LIMIT CHECK ──
+  // ── 1. RATE LIMIT CHECK ──
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     request.headers.get("x-real-ip") ??
@@ -75,12 +63,12 @@ export async function GET(request: Request) {
       ? seenParam.split(",").filter(Boolean)
       : [];
 
-    // Sanitize
+    // Sanitize seen IDs
     seenIds = seenIds.filter((id) => /^\d+$/.test(id)).slice(0, SEEN_ID_LIMIT);
 
     const supabase = await createClient();
 
-    // ── SEQUENTIAL MODE ──
+    // ── 2. SEQUENTIAL MODE ──
     if (mode === "sequential") {
       let query = supabase
         .from("tracks")
@@ -95,7 +83,7 @@ export async function GET(request: Request) {
 
       const { data, error } = await query.single();
 
-      // If nothing found after lastId, wrap around from the beginning
+      // Wrap around logic
       if (error || !data) {
         let wrapQuery = supabase
           .from("tracks")
@@ -109,7 +97,7 @@ export async function GET(request: Request) {
 
         const { data: wrapData, error: wrapError } = await wrapQuery.single();
 
-        // All tracks seen — full reset
+        // Full reset if everything is seen
         if (wrapError || !wrapData) {
           const { data: resetData, error: resetError } = await supabase
             .from("tracks")
@@ -124,16 +112,11 @@ export async function GET(request: Request) {
               { status: 404 },
             );
 
-          const [previewUrl, albumArt] = await Promise.all([
-            signS3Url(resetData.audio_url),
-            signS3Url(resetData.album_art),
-          ]);
-
           return NextResponse.json({
             trackName: resetData.track_name,
             albumName: resetData.album_name,
-            albumArt,
-            previewUrl,
+            albumArt: getMediaUrl(resetData.album_art),
+            previewUrl: getMediaUrl(resetData.audio_url),
             startTime: resetData.start_time,
             endTime: resetData.end_time,
             verse: resetData.verse,
@@ -142,16 +125,11 @@ export async function GET(request: Request) {
           });
         }
 
-        const [previewUrl, albumArt] = await Promise.all([
-          signS3Url(wrapData.audio_url),
-          signS3Url(wrapData.album_art),
-        ]);
-
         return NextResponse.json({
           trackName: wrapData.track_name,
           albumName: wrapData.album_name,
-          albumArt,
-          previewUrl,
+          albumArt: getMediaUrl(wrapData.album_art),
+          previewUrl: getMediaUrl(wrapData.audio_url),
           startTime: wrapData.start_time,
           endTime: wrapData.end_time,
           verse: wrapData.verse,
@@ -160,16 +138,11 @@ export async function GET(request: Request) {
         });
       }
 
-      const [previewUrl, albumArt] = await Promise.all([
-        signS3Url(data.audio_url),
-        signS3Url(data.album_art),
-      ]);
-
       return NextResponse.json({
         trackName: data.track_name,
         albumName: data.album_name,
-        albumArt,
-        previewUrl,
+        albumArt: getMediaUrl(data.album_art),
+        previewUrl: getMediaUrl(data.audio_url),
         startTime: data.start_time,
         endTime: data.end_time,
         verse: data.verse,
@@ -178,10 +151,11 @@ export async function GET(request: Request) {
       });
     }
 
-    // ── SHUFFLE MODE ──
+    // ── 3. SHUFFLE MODE ──
     let countQuery = supabase
       .from("tracks")
       .select("*", { count: "exact", head: true });
+
     if (seenIds.length > 0) {
       countQuery = countQuery.not("id", "in", `(${seenIds.join(",")})`);
     }
@@ -189,6 +163,7 @@ export async function GET(request: Request) {
     const { count, error: countError } = await countQuery;
     if (countError) throw countError;
 
+    // Handle case where all available tracks are seen
     if (!count || count === 0) {
       const { count: totalCount } = await supabase
         .from("tracks")
@@ -206,16 +181,11 @@ export async function GET(request: Request) {
 
       if (error) throw error;
 
-      const [previewUrl, albumArt] = await Promise.all([
-        signS3Url(data.audio_url),
-        signS3Url(data.album_art),
-      ]);
-
       return NextResponse.json({
         trackName: data.track_name,
         albumName: data.album_name,
-        albumArt,
-        previewUrl,
+        albumArt: getMediaUrl(data.album_art),
+        previewUrl: getMediaUrl(data.audio_url),
         startTime: data.start_time,
         endTime: data.end_time,
         verse: data.verse,
@@ -229,6 +199,7 @@ export async function GET(request: Request) {
       .from("tracks")
       .select("*")
       .range(randomOffset, randomOffset);
+
     if (seenIds.length > 0) {
       dataQuery = dataQuery.not("id", "in", `(${seenIds.join(",")})`);
     }
@@ -236,16 +207,11 @@ export async function GET(request: Request) {
     const { data, error } = await dataQuery.single();
     if (error) throw error;
 
-    const [previewUrl, albumArt] = await Promise.all([
-      signS3Url(data.audio_url),
-      signS3Url(data.album_art),
-    ]);
-
     return NextResponse.json({
       trackName: data.track_name,
       albumName: data.album_name,
-      albumArt,
-      previewUrl,
+      albumArt: getMediaUrl(data.album_art),
+      previewUrl: getMediaUrl(data.audio_url),
       startTime: data.start_time,
       endTime: data.end_time,
       verse: data.verse,
