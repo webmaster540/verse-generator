@@ -138,6 +138,19 @@
   text-align: center;
 }
 
+.albumNameDisplay {
+  font-size: 8px;
+  color: #4db8ff;
+  margin-top: 2px;
+  padding-bottom: 6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
+}
+
 /* ─── 5. TRANSPORT & UI ─── */
 .transport {
   display: flex;

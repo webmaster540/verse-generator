@@ -169,6 +169,9 @@ export default function WinampPlayer({
           </div>
 
           <div className={styles.infoRow}>
+            <div className={styles.albumNameDisplay}>
+              {track?.albumName || "VERSE GENERATOR"}
+            </div>
             <div className={styles.clock}>{formatTime(currentTime)}</div>
             <div className={styles.metaBlock}>
               <div className={styles.trackNameDisplay}>

@@ -181,6 +181,7 @@
 }
 
 .screenPrompt {
+  cursor: pointer;
   margin-top: 15px;
   font-size: 12px;
   color: #e0e0e0;

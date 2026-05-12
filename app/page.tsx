@@ -2,8 +2,8 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
-import WinampPlayer from "./components/WinampPlayer";
-import Walkman from "./components/Walkman";
+import WinampPlayer from "./components/Winamp/WinampPlayer";
+import Walkman from "./components/Walkman/Walkman";
 import styles from "./Selection.module.css";
 
 function PlayerController() {

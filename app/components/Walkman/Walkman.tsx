@@ -134,6 +134,8 @@ export default function Walkman() {
   const isLoading = state === "loading";
   const isIdle = state === "idle";
 
+  // console.log("Current Track:", track);
+
   return (
     <div className={styles.scene}>
       {/* Dynamic Blurred Background */}
@@ -204,7 +206,9 @@ export default function Walkman() {
               <div className={styles.screenIdle}>
                 <div className={styles.screenBrand}>JAY-Z</div>
                 <div className={styles.screenSub}>VERSE GENERATOR</div>
-                <div className={styles.screenPrompt}>PRESS PLAY</div>
+                <div onClick={fetchTrack} className={styles.screenPrompt}>
+                  PRESS PLAY
+                </div>
               </div>
             )}
 
@@ -230,20 +234,26 @@ export default function Walkman() {
                     alt="Art"
                   />
                   <div className={styles.trackInfoText}>
-                    <span className={styles.artistName}>JAY-Z</span>
+                    <span className={styles.artistName}>{track.albumName}</span>
                     <span className={styles.screenTrackName}>
                       {track.trackName}
                     </span>
                   </div>
                 </div>
 
-                <div className={styles.verse}>
-                  {track.verse.split("\n").map((line, i) => (
-                    <div key={i} className={styles.verseLine}>
-                      {line}
-                    </div>
-                  ))}
-                </div>
+                {track.verse ? (
+                  <div className={styles.verse}>
+                    {track.verse.split("\n").map((line, i) => (
+                      <div key={i} className={styles.verseLine}>
+                        {line}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className={styles.verse}>
+                    <div>No lyrics available</div>
+                  </div>
+                )}
               </>
             )}
 
